@@ -4,9 +4,24 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   updateProfile,
+  User,
 } from 'firebase/auth'
-import { doc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore'
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+  writeBatch,
+} from 'firebase/firestore'
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { v4 as uuid } from 'uuid'
+import { ChatDocument, UserDocument } from './types'
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -42,11 +57,12 @@ export const registerUser = async (
   const downloadProfilePictureURL = await getDownloadURL(profilePictureRef)
 
   await setDoc(doc(db, 'users', user.uid), {
-    uid: user.uid,
+    id: user.uid,
     username,
     email,
     photoURL: downloadProfilePictureURL,
     createdAt: serverTimestamp(),
+    chatRefs: [],
   })
 
   await updateProfile(user, {
@@ -55,4 +71,74 @@ export const registerUser = async (
   })
 
   return user
+}
+
+export const getUsers = async (userId: string, username: string) => {
+  const q = query(
+    collection(db, 'users'),
+    where('username', '==', username),
+    where('id', '!=', userId)
+  )
+  try {
+    const querySnapshot = await getDocs(q)
+    const userDocuments = querySnapshot.docs.map(
+      (docSnap) => docSnap.data() as UserDocument
+    )
+
+    return userDocuments
+  } catch (e) {
+    throw new Error()
+  }
+}
+
+export const createChat = async (
+  currentUser: User,
+  searchedUser: UserDocument
+) => {
+  const batch = writeBatch(db)
+
+  const chatId = uuid()
+  const chatRef = doc(db, 'chats', chatId)
+
+  batch.set(chatRef, {
+    id: chatId,
+    createdAt: serverTimestamp(),
+    participants: [
+      {
+        id: currentUser.uid,
+        displayName: currentUser.displayName,
+        photoURL: currentUser.photoURL,
+      },
+      {
+        id: searchedUser.id,
+        displayName: searchedUser.username,
+        photoURL: searchedUser.photoURL,
+      },
+    ],
+  })
+
+  batch.update(doc(db, 'users', currentUser.uid), {
+    chatRefs: arrayUnion(chatRef),
+  })
+
+  batch.update(doc(db, 'users', searchedUser.id), {
+    chatRefs: arrayUnion(chatRef),
+  })
+
+  await batch.commit()
+}
+
+export const getAllChats = async (userId: string) => {
+  const userSnap = await getDoc(doc(db, 'users', userId))
+  const userDoc = userSnap.data() as UserDocument
+
+  const chatRefs = userDoc.chatRefs
+  const chatSnaps = await Promise.all(
+    chatRefs.map((chatRef) => getDoc(chatRef))
+  )
+  const chatDocs = chatSnaps
+    .map((chatSnap) => chatSnap.data())
+    .filter((chatDoc) => chatDoc !== undefined) as ChatDocument[]
+
+  return chatDocs
 }
