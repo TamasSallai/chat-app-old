@@ -1,4 +1,4 @@
-import MessageEntry from './MessageEntry'
+import MessageEntry from './MessageEntry/MessageEntry'
 
 export const ChatWindow = () => {
   return (

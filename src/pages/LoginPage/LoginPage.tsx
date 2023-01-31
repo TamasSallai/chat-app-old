@@ -1,12 +1,10 @@
 import { useState } from 'react'
-import { useAuthContext } from '../context/auth'
-import { registerUser } from '../firebase'
+import { useAuthContext } from '../../context/auth'
+import { loginUser } from '../../firebase'
 
-const RegisterPage = () => {
-  const [username, setUsername] = useState('')
+const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [file, setFile] = useState<File>()
   const [error, setError] = useState<string | null>(null)
 
   const [, dispatch] = useAuthContext()
@@ -14,27 +12,17 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      if (file) {
-        const user = await registerUser(username, email, password, file)
-        dispatch({ type: 'LOGIN', payload: user })
-      }
+      const user = await loginUser(email, password)
+      dispatch({ type: 'LOGIN', payload: user })
     } catch (e) {
       if (e instanceof Error) setError(e.message)
     }
   }
 
   return (
-    <div>
+    <div className="login-page">
       {error && <div>{error}</div>}
       <form onSubmit={(e) => handleSubmit(e)}>
-        <div>
-          <label>Username</label>
-          <input
-            type="text"
-            required
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
         <div>
           <label>E-mail</label>
           <input
@@ -51,18 +39,10 @@ const RegisterPage = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <div>
-          <label>Photo</label>
-          <input
-            type="file"
-            required
-            onChange={(e) => setFile(e.currentTarget.files![0])}
-          />
-        </div>
         <button type="submit">Login</button>
       </form>
     </div>
   )
 }
 
-export default RegisterPage
+export default LoginPage
