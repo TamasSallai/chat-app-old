@@ -1,8 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 import Navigation from './components/Navigation'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Chat from './pages/Chat'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
+import ChatPage from './pages/ChatPage'
 import './App.css'
 
 function App() {
@@ -11,9 +11,9 @@ function App() {
       <Navigation />
       <br />
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/chat" element={<Chat />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/chat" element={<ChatPage />} />
       </Routes>
     </div>
   )

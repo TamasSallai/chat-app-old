@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuthContext } from '../context/auth'
 import { registerUser } from '../firebase'
 
-const Register = () => {
+const RegisterPage = () => {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -65,4 +65,4 @@ const Register = () => {
   )
 }
 
-export default Register
+export default RegisterPage
