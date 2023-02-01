@@ -50,9 +50,21 @@ const Sidebar = () => {
           )}
 
           <div>
-            <UserEntry />
-            <UserEntry />
-            <UserEntry />
+            <UserEntry
+              isExpanded={isExpanded}
+              username="TamasSallai"
+              photoURL="https://firebasestorage.googleapis.com/v0/b/chat-app-e1a49.appspot.com/o/tamas.sallai.hu%40gmail.com?alt=media&token=1f3eac62-d626-4e26-825b-16a63a346ea1"
+            />
+            <UserEntry
+              isExpanded={isExpanded}
+              username="TamasSallai"
+              photoURL="https://firebasestorage.googleapis.com/v0/b/chat-app-e1a49.appspot.com/o/tamas.sallai.hu%40gmail.com?alt=media&token=1f3eac62-d626-4e26-825b-16a63a346ea1"
+            />
+            <UserEntry
+              isExpanded={isExpanded}
+              username="TamasSallai"
+              photoURL="https://firebasestorage.googleapis.com/v0/b/chat-app-e1a49.appspot.com/o/tamas.sallai.hu%40gmail.com?alt=media&token=1f3eac62-d626-4e26-825b-16a63a346ea1"
+            />
           </div>
         </div>
 

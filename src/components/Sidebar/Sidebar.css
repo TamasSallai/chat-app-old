@@ -100,10 +100,10 @@
   border-radius: 25px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 700px) {
   .sidebar-outer {
     position: fixed;
-    width: 5rem;
+    width: 4.5rem;
     z-index: 9999;
   }
 }
