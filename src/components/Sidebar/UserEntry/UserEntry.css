@@ -1,0 +1,26 @@
+.user-entry {
+  height: 4.5rem;
+  padding: 0 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: background-color 100 ms ease-in;
+}
+
+.user-entry-expanded {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.start-chat-button {
+  padding: 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .user-entry {
+    height: 4.5rem;
+  }
+}

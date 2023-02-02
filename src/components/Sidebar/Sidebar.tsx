@@ -1,10 +1,61 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useAuthContext } from '../../context/auth'
+import { useChatContext } from '../../context/chat'
+import { ChatDocument, UserDocument } from '../../types'
+import { doc, getDoc, onSnapshot } from 'firebase/firestore'
+import { createChat, db, getUsers } from '../../firebase'
 import UserEntry from './UserEntry/UserEntry'
 import ChatEntry from './ChatEntry/ChatEntry'
 import './Sidebar.css'
 
 const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true)
+  const [searchInput, setSearchInput] = useState('')
+  const [users, setUsers] = useState<UserDocument[]>([])
+  const [currentUser] = useAuthContext()
+  const [data, dispatch] = useChatContext()
+
+  useEffect(() => {
+    const getChatsOnUserChange = (currentUserId: string) => {
+      const unsub = onSnapshot(
+        doc(db, 'users', currentUserId),
+        async (userSnap) => {
+          const userDoc = userSnap.data() as UserDocument
+          const chatRefs = userDoc.chatRefs
+          const chatSnaps = await Promise.all(
+            chatRefs.map((chatRef) => getDoc(chatRef))
+          )
+          const chatDocs = chatSnaps
+            .map((chatSnap) => chatSnap.data())
+            .filter((chatDoc) => chatDoc !== undefined) as ChatDocument[]
+
+          dispatch({ type: 'GET_CHATS', payload: chatDocs })
+        }
+      )
+      return () => unsub()
+    }
+
+    currentUser && getChatsOnUserChange(currentUser.uid)
+  }, [currentUser, dispatch])
+
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    try {
+      if (e.code === 'Enter' && currentUser) {
+        const firebaseUsers = await getUsers(currentUser.uid, searchInput)
+        setUsers(firebaseUsers)
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(e.message)
+      }
+    }
+  }
+
+  const handleCreateChat = async (userDoc: UserDocument) => {
+    await createChat(currentUser!, userDoc)
+    setSearchInput('')
+    setUsers([])
+  }
 
   return (
     <div className="sidebar-outer" data-expanded={isExpanded}>
@@ -27,7 +78,7 @@ const Sidebar = () => {
       <div className="sidebar-inner">
         {/* Search */}
         <div className="search-section">
-          <h3 className="search-header">
+          <h3 className="sidebar-header">
             {isExpanded ? 'Search users' : 'Search'}
           </h3>
           {isExpanded ? (
@@ -36,6 +87,9 @@ const Sidebar = () => {
                 className="search-input"
                 type="text"
                 placeholder="Find users..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => handleKeyDown(e)}
               />
             </div>
           ) : (
@@ -50,112 +104,24 @@ const Sidebar = () => {
           )}
 
           <div>
-            <UserEntry />
-            <UserEntry />
-            <UserEntry />
+            {users.map((user) => (
+              <UserEntry
+                key={user.id}
+                {...user}
+                onClick={() => handleCreateChat(user)}
+                isExpanded={isExpanded}
+              />
+            ))}
           </div>
         </div>
 
         {/* Chats */}
-        <div>
-          <h3>Chats</h3>
+        <div className="chats-section">
+          <h3 className="sidebar-header">Chats</h3>
           <div>
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
-            <ChatEntry />
+            {Object.values(data.chatList).map((chat) => (
+              <ChatEntry key={chat.id} chat={chat} isExpanded={isExpanded} />
+            ))}
           </div>
         </div>
       </div>

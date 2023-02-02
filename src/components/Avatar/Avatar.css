@@ -1,0 +1,27 @@
+.avatar-image-container {
+  min-height: 3.5rem;
+  min-width: 3.5rem;
+  height: 3.5rem;
+  width: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9ecf5;
+  border: 1px solid #e9ecf5;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar-image {
+  height: 110%;
+  width: auto;
+}
+
+@media (max-width: 700px) {
+  .avatar-image-container {
+    min-height: 3rem;
+    min-width: 3rem;
+    height: 3rem;
+    width: 3rem;
+  }
+}
