@@ -13,6 +13,7 @@ import {
   getDoc,
   getDocs,
   getFirestore,
+  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
@@ -34,7 +35,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
-const db = getFirestore(app)
+export const db = getFirestore(app)
 const storage = getStorage(app)
 
 export const loginUser = async (email: string, password: string) => {
@@ -73,17 +74,14 @@ export const registerUser = async (
   return user
 }
 
-export const getUsers = async (userId: string, username: string) => {
-  const q = query(
-    collection(db, 'users'),
-    where('username', '==', username),
-    where('id', '!=', userId)
-  )
+export const getUsers = async (currentUserId: string, username: string) => {
+  const q = query(collection(db, 'users'), where('username', '==', username))
+
   try {
     const querySnapshot = await getDocs(q)
-    const userDocuments = querySnapshot.docs.map(
-      (docSnap) => docSnap.data() as UserDocument
-    )
+    const userDocuments = querySnapshot.docs
+      .map((docSnap) => docSnap.data() as UserDocument)
+      .filter((data) => data.uid !== currentUserId)
 
     return userDocuments
   } catch (e) {
@@ -106,12 +104,12 @@ export const createChat = async (
     participants: [
       {
         id: currentUser.uid,
-        displayName: currentUser.displayName,
+        username: currentUser.displayName,
         photoURL: currentUser.photoURL,
       },
       {
         id: searchedUser.id,
-        displayName: searchedUser.username,
+        username: searchedUser.username,
         photoURL: searchedUser.photoURL,
       },
     ],

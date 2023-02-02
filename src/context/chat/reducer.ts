@@ -1,11 +1,12 @@
-import { Chat, Chats } from './state'
+import { ChatDocument } from '../../types'
+import { ChatContextType } from './state'
 
 export type Action =
-  | { type: 'GET_CHATS'; payload: Chat[] }
-  | { type: 'ADD_CHAT'; payload: Chat }
-  | { type: 'SELECT_CHAT'; payload: Chat }
+  | { type: 'GET_CHATS'; payload: ChatDocument[] }
+  | { type: 'ADD_CHAT'; payload: ChatDocument }
+  | { type: 'SELECT_CHAT'; payload: ChatDocument }
 
-export const reducer = (state: Chats, action: Action) => {
+export const reducer = (state: ChatContextType, action: Action) => {
   switch (action.type) {
     case 'GET_CHATS': {
       return {

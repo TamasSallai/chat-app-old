@@ -1,30 +1,34 @@
-import { DocumentData, DocumentReference } from 'firebase/firestore'
+import { DocumentData, DocumentReference, Timestamp } from 'firebase/firestore'
 
 export interface UserDocument extends DocumentData {
   id: string
   username: string
   email: string
   photoURL: string
-  createdAt: Date
+  createdAt: Timestamp
   chatRefs: DocumentReference[]
 }
 
-interface UserInfo {
+export interface UserInfo {
   id: string
   username: string
   photoURL: string
 }
 
-interface MessageInfo {
+export interface Message {
   id: string
   senderId: string
   content: string
-  createdAt: Date
+  createdAt: Timestamp
 }
 
 export interface ChatDocument extends DocumentData {
   id: string
-  createdAt: Date
+  createdAt: Timestamp
   participants: UserInfo[]
-  lastMessage: MessageInfo
+  lastMessage?: Message
+}
+
+export interface ChatDocumentWithMessages extends ChatDocument {
+  messages: Message[]
 }
