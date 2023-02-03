@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useAuthContext } from '../../context/auth'
 import { useChatContext } from '../../context/chat'
-import { ChatDocument, UserDocument } from '../../types'
-import { doc, getDoc, onSnapshot } from 'firebase/firestore'
-import { createChat, db, getUsers } from '../../firebase'
+import { UserDocument } from '../../types'
+import { createChat, getUsers } from '../../firebase'
 import UserEntry from './UserEntry/UserEntry'
 import ChatEntry from './ChatEntry/ChatEntry'
 import './Sidebar.css'
@@ -13,30 +12,7 @@ const Sidebar = () => {
   const [searchInput, setSearchInput] = useState('')
   const [users, setUsers] = useState<UserDocument[]>([])
   const [currentUser] = useAuthContext()
-  const [data, dispatch] = useChatContext()
-
-  useEffect(() => {
-    const getChatsOnUserChange = (currentUserId: string) => {
-      const unsub = onSnapshot(
-        doc(db, 'users', currentUserId),
-        async (userSnap) => {
-          const userDoc = userSnap.data() as UserDocument
-          const chatRefs = userDoc.chatRefs
-          const chatSnaps = await Promise.all(
-            chatRefs.map((chatRef) => getDoc(chatRef))
-          )
-          const chatDocs = chatSnaps
-            .map((chatSnap) => chatSnap.data())
-            .filter((chatDoc) => chatDoc !== undefined) as ChatDocument[]
-
-          dispatch({ type: 'GET_CHATS', payload: chatDocs })
-        }
-      )
-      return () => unsub()
-    }
-
-    currentUser && getChatsOnUserChange(currentUser.uid)
-  }, [currentUser, dispatch])
+  const [data] = useChatContext()
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     try {

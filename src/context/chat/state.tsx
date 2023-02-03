@@ -1,10 +1,10 @@
 import { createContext, useContext, useReducer } from 'react'
-import { ChatDocument } from '../../types'
+import { Chat } from '../../types'
 import { Action, reducer } from './reducer'
 
 export interface ChatContextType {
-  currentChat: ChatDocument | null
-  chatList: { [id: string]: ChatDocument }
+  currentChat: Chat | null
+  chatList: { [id: string]: Chat }
 }
 
 const initialState = {

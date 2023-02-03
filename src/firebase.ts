@@ -13,7 +13,7 @@ import {
   getDoc,
   getDocs,
   getFirestore,
-  onSnapshot,
+  limit,
   query,
   serverTimestamp,
   setDoc,
@@ -139,4 +139,13 @@ export const getAllChats = async (userId: string) => {
     .filter((chatDoc) => chatDoc !== undefined) as ChatDocument[]
 
   return chatDocs
+}
+
+export const getMessages = async (chatId: string, queryLimit: number) => {
+  const messagesRef = collection(doc(db, 'chats', chatId), 'messages')
+  const q = query(messagesRef, limit(queryLimit))
+  const querySnapshot = await getDocs(q)
+  const messageDocs = querySnapshot.docs.map((docSnap) => docSnap.data())
+
+  return messageDocs
 }

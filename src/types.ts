@@ -32,3 +32,29 @@ export interface ChatDocument extends DocumentData {
 export interface ChatDocumentWithMessages extends ChatDocument {
   messages: Message[]
 }
+
+export interface Chat {
+  id: string
+  chatName: string
+  chatImageURL: string
+  participants: UserInfo[]
+  lastMessage?: Message
+  messages: Message[]
+}
+
+export const convertChat = (
+  currentUserId: string,
+  chatDoc: ChatDocument
+): Chat => {
+  const { id, participants, lastMessage } = chatDoc
+  const userInfo = participants.find((user) => user.id !== currentUserId)
+
+  return {
+    id: id,
+    chatName: userInfo!.username,
+    chatImageURL: userInfo!.photoURL,
+    participants: participants,
+    lastMessage: lastMessage,
+    messages: [],
+  }
+}
