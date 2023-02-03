@@ -1,17 +1,16 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuthContext } from '../../../context/auth'
-import { ChatDocument, Message, UserInfo } from '../../../types'
+import { Chat, Message } from '../../../types'
 import Avatar from '../../Avatar/Avatar'
 import './ChatEntry.css'
 
 interface ChatEntryProps {
   isExpanded: boolean
-  chat: ChatDocument
+  chat: Chat
 }
 
 const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
-  const { lastMessage } = chat
-  const { participants } = chat
+  const { chatName, chatImageURL, lastMessage } = chat
   const [currentUser] = useAuthContext()
   const [lastMessageTime, setLastMessageTime] = useState('')
 
@@ -33,26 +32,16 @@ const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
         () => calculateLastMessageTime(lastMessage),
         3600000
       )
-
       return () => clearInterval(interval)
     }
   }, [lastMessage])
 
-  const userInfoMemo = useMemo((): UserInfo | null => {
-    if (!currentUser) {
-      return null
-    }
-    return participants.find((user) => user.id !== currentUser.uid) as UserInfo
-  }, [currentUser, participants])
-
   return (
     <div className="chat-entry">
-      <Avatar imagePath={userInfoMemo ? userInfoMemo.photoURL : ''} />
+      <Avatar imagePath={chatImageURL} />
       {isExpanded && (
         <div className="chat-entry-expanded">
-          {userInfoMemo && (
-            <div className="chat-name">{userInfoMemo.username}</div>
-          )}
+          <div className="chat-name">{chatName}</div>
           {lastMessage && (
             <div className="last-message-container">
               <div className="last-message">

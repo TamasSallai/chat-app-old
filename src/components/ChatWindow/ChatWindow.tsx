@@ -1,6 +1,6 @@
 import MessageEntry from './MessageEntry/MessageEntry'
 
-export const ChatWindow = () => {
+const ChatWindow = () => {
   return (
     <div>
       {/* Chat header */}
@@ -22,3 +22,5 @@ export const ChatWindow = () => {
     </div>
   )
 }
+
+export default ChatWindow
