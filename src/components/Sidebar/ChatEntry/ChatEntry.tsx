@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useAuthContext } from '../../../context/auth'
+import { useUserContext } from '../../../context/auth'
 import { Chat, Message } from '../../../types'
 import Avatar from '../../Avatar/Avatar'
 import './ChatEntry.css'
@@ -11,7 +11,7 @@ interface ChatEntryProps {
 
 const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
   const { chatName, chatImageURL, lastMessage } = chat
-  const [currentUser] = useAuthContext()
+  const [currentUser] = useUserContext()
   const [lastMessageTime, setLastMessageTime] = useState('')
 
   const calculateLastMessageTime = ({ createdAt }: Message) => {
@@ -45,7 +45,7 @@ const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
           {lastMessage && (
             <div className="last-message-container">
               <div className="last-message">
-                {lastMessage.senderId === currentUser!.uid
+                {lastMessage.senderId === currentUser.uid
                   ? `You: ${lastMessage.content}`
                   : lastMessage.content}
               </div>

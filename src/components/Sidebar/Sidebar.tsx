@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAuthContext } from '../../context/auth'
+import { useUserContext } from '../../context/auth'
 import { useChatContext } from '../../context/chat'
 import { UserDocument } from '../../types'
 import { createChat, getUsers } from '../../firebase'
@@ -11,12 +11,12 @@ const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(true)
   const [searchInput, setSearchInput] = useState('')
   const [users, setUsers] = useState<UserDocument[]>([])
-  const [currentUser] = useAuthContext()
+  const [currentUser] = useUserContext()
   const [data] = useChatContext()
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     try {
-      if (e.code === 'Enter' && currentUser) {
+      if (e.code === 'Enter') {
         const firebaseUsers = await getUsers(currentUser.uid, searchInput)
         setUsers(firebaseUsers)
       }
@@ -28,7 +28,7 @@ const Sidebar = () => {
   }
 
   const handleCreateChat = async (userDoc: UserDocument) => {
-    await createChat(currentUser!, userDoc)
+    await createChat(currentUser, userDoc)
     setSearchInput('')
     setUsers([])
   }

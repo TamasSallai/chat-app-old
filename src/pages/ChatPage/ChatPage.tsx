@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useAuthContext } from '../../context/auth'
+import { useUserContext } from '../../context/auth'
 import { useChatContext } from '../../context/chat'
 import { ChatDocument, convertChat, UserDocument } from '../../types'
 import { doc, getDoc, onSnapshot } from 'firebase/firestore'
@@ -9,7 +9,7 @@ import ChatWindow from '../../components/ChatWindow/ChatWindow'
 import './ChatPage.css'
 
 const ChatPage = () => {
-  const [currentUser] = useAuthContext()
+  const [currentUser] = useUserContext()
   const [, dispatch] = useChatContext()
 
   useEffect(() => {
@@ -36,7 +36,7 @@ const ChatPage = () => {
       return () => unsub()
     }
 
-    currentUser && getChatsOnUserChange(currentUser.uid)
+    getChatsOnUserChange(currentUser.uid)
   }, [currentUser, dispatch])
 
   return (
