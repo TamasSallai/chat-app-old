@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useUserContext } from '../../../context/auth'
 import { Chat, Message } from '../../../types'
 import Avatar from '../../Avatar/Avatar'
@@ -37,7 +38,7 @@ const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
   }, [lastMessage])
 
   return (
-    <div className="chat-entry">
+    <Link className="chat-entry" to={chat.id}>
       <Avatar imagePath={chatImageURL} />
       {isExpanded && (
         <div className="chat-entry-expanded">
@@ -54,7 +55,7 @@ const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
           )}
         </div>
       )}
-    </div>
+    </Link>
   )
 }
 
