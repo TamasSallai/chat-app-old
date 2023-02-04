@@ -17,6 +17,8 @@ const AuthContext = createContext<[User | null, React.Dispatch<Action>]>([
 ])
 
 export const useAuthContext = () => useContext(AuthContext)
+export const useUserContext = () =>
+  useContext(AuthContext) as [User, React.Dispatch<Action>]
 
 type UserProviderProps = {
   children: React.ReactNode
