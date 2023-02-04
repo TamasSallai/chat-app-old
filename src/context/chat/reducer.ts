@@ -4,7 +4,7 @@ import { ChatContextType } from './state'
 export type Action =
   | { type: 'GET_CHATS'; payload: Chat[] }
   | { type: 'ADD_CHAT'; payload: Chat }
-  | { type: 'SELECT_CHAT'; payload: Chat }
+  | { type: 'SELECT_CHAT'; payload: string }
 
 export const reducer = (state: ChatContextType, action: Action) => {
   switch (action.type) {
@@ -29,7 +29,7 @@ export const reducer = (state: ChatContextType, action: Action) => {
     case 'SELECT_CHAT': {
       return {
         ...state,
-        currentChat: action.payload,
+        currentChat: state.chatList[action.payload],
       }
     }
     default: {
