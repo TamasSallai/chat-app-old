@@ -8,7 +8,8 @@ const ChatPage = () => {
     <div className="chat-page">
       <Sidebar />
       <Routes>
-        <Route path="/chat/:id" element={<ChatWindow />} />
+        <Route path="/" element={<div>Hello World</div>} />
+        <Route path="/:id" element={<ChatWindow />} />
       </Routes>
     </div>
   )
