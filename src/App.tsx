@@ -5,19 +5,9 @@ import LoginPage from './pages/LoginPage/LoginPage'
 import RegisterPage from './pages/RegisterPage/RegisterPage'
 import ChatPage from './pages/ChatPage/ChatPage'
 import ProtectedRoute from './ProtectRoute'
-import { useChatContext } from './context/chat'
+import { ChatProvider } from './context/chat'
 
 function App() {
-  const match = useMatch('/chat/:id')
-  const matchMemo = useMemo(() => match?.params.id, [match])
-  const [, dispatch] = useChatContext()
-
-  useEffect(() => {
-    if (matchMemo) {
-      dispatch({ type: 'SELECT_CHAT', payload: matchMemo })
-    }
-  }, [matchMemo, dispatch])
-
   return (
     <div>
       <Navigation />
@@ -29,7 +19,9 @@ function App() {
           path="/chat/*"
           element={
             <ProtectedRoute>
-              <ChatPage />
+              <ChatProvider>
+                <ChatPage />
+              </ChatProvider>
             </ProtectedRoute>
           }
         />

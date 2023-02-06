@@ -22,6 +22,8 @@ export interface Message {
   createdAt: Timestamp
 }
 
+export type MessageDocument = Message & DocumentData
+
 export interface ChatDocument extends DocumentData {
   id: string
   createdAt: Timestamp

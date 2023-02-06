@@ -14,6 +14,7 @@ import {
   getDocs,
   getFirestore,
   limit,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -22,7 +23,7 @@ import {
 } from 'firebase/firestore'
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 import { v4 as uuid } from 'uuid'
-import { ChatDocument, UserDocument } from './types'
+import { ChatDocument, MessageDocument, UserDocument } from './types'
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -143,9 +144,35 @@ export const getAllChats = async (userId: string) => {
 
 export const getMessages = async (chatId: string, queryLimit: number) => {
   const messagesRef = collection(doc(db, 'chats', chatId), 'messages')
-  const q = query(messagesRef, limit(queryLimit))
+  const q = query(messagesRef, limit(queryLimit), orderBy('createdAt'))
   const querySnapshot = await getDocs(q)
-  const messageDocs = querySnapshot.docs.map((docSnap) => docSnap.data())
+  const messageDocs = querySnapshot.docs.map(
+    (docSnap) => docSnap.data() as MessageDocument
+  )
 
   return messageDocs
+}
+
+export const createMessage = async (
+  chatId: string,
+  currentUserId: string,
+  content: string
+) => {
+  const messageId = uuid()
+  const message = {
+    mid: messageId,
+    senderId: currentUserId,
+    content: content,
+    createdAt: serverTimestamp(),
+  }
+
+  const batch = writeBatch(db)
+
+  batch.set(doc(db, 'chats', chatId, 'messages', messageId), message)
+
+  batch.update(doc(db, 'chats', chatId), {
+    lastMessage: message,
+  })
+
+  await batch.commit()
 }
