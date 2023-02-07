@@ -1,5 +1,11 @@
-import { createContext, useContext, useEffect, useReducer } from 'react'
-import { useAuthContext } from '../auth'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react'
+import { useUserContext } from '../auth'
 import { Action, reducer } from './reducer'
 import { Chat, ChatDocument, convertChat, UserDocument } from '../../types'
 import { doc, getDoc, onSnapshot } from 'firebase/firestore'
@@ -28,7 +34,8 @@ interface ChatProviderProps {
 
 export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [chats, dispatch] = useReducer(reducer, initialState)
-  const [currentUser] = useAuthContext()
+  const [currentUser] = useUserContext()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const getChatsOnUserChange = (currentUserId: string) => {
@@ -49,17 +56,21 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
             })
 
           dispatch({ type: 'GET_CHATS', payload: chats })
+          setIsLoading(false)
         }
       )
 
       return () => unsub()
     }
-    currentUser && getChatsOnUserChange(currentUser.uid)
-  }, [currentUser])
+
+    if (currentUser.uid) {
+      getChatsOnUserChange(currentUser.uid)
+    }
+  }, [currentUser.uid])
 
   return (
     <ChatContext.Provider value={[chats, dispatch]}>
-      {children}
+      {!isLoading && children}
     </ChatContext.Provider>
   )
 }
