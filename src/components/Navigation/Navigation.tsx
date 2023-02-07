@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useAuthContext } from '../../context/auth'
+import Avatar from '../Avatar/Avatar'
 import './Navigation.css'
 
 const Navigation = () => {
@@ -39,6 +40,7 @@ const Navigation = () => {
         {currentUser && (
           <div className="user-badge">
             <div>{currentUser.displayName}</div>
+            <Avatar imagePath={currentUser.photoURL!} />
             <button onClick={() => dispatch({ type: 'LOGOUT' })}>Logout</button>
           </div>
         )}
