@@ -2,8 +2,8 @@ import { Route, Routes, useMatch } from 'react-router-dom'
 import Sidebar from '../../components/Sidebar/Sidebar'
 import { useChatContext } from '../../context/chat'
 import ChatWindow from '../../components/ChatWindow/ChatWindow'
-import './ChatPage.css'
 import { useEffect, useMemo } from 'react'
+import './ChatPage.css'
 
 const ChatPage = () => {
   const [{ currentChat }] = useChatContext()

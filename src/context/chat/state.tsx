@@ -7,13 +7,13 @@ import {
 } from 'react'
 import { useUserContext } from '../auth'
 import { Action, reducer } from './reducer'
-import { Chat, ChatDocument, convertChat, UserDocument } from '../../types'
-import { doc, getDoc, onSnapshot } from 'firebase/firestore'
+import { ChatDocument } from '../../types'
+import { collection, onSnapshot, query, where } from 'firebase/firestore'
 import { db } from '../../firebase'
 
 export interface ChatContextType {
-  currentChat: Chat | null
-  chatList: { [id: string]: Chat }
+  currentChat: ChatDocument | null
+  chatList: { [id: string]: ChatDocument }
 }
 
 const initialState = {
@@ -38,34 +38,25 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const getChatsOnUserChange = (currentUserId: string) => {
-      const unsub = onSnapshot(
-        doc(db, 'users', currentUserId),
-        async (userSnap) => {
-          const userDoc = userSnap.data() as UserDocument
-          const chatRefs = userDoc.chatRefs
-          const chatSnaps = await Promise.all(
-            chatRefs.map((chatRef) => getDoc(chatRef))
-          )
-
-          const chats = chatSnaps
-            .filter((chatSnap) => chatSnap.exists())
-            .map((chatSnap) => {
-              const chatDoc = chatSnap.data() as ChatDocument
-              return convertChat(currentUserId, chatDoc)
-            })
-
-          dispatch({ type: 'GET_CHATS', payload: chats })
-          setIsLoading(false)
-        }
+    console.log('Subscribe to group snapshot listener.')
+    const fetchGroupsByUser = (uid: string) => {
+      const q = query(
+        collection(db, 'chats'),
+        where(`members.${uid}`, '!=', null)
       )
-
-      return () => unsub()
+      const unsub = onSnapshot(q, (querySnapshot) => {
+        const chats = querySnapshot.docs.map(
+          (chatSnap) => chatSnap.data() as ChatDocument
+        )
+        dispatch({ type: 'GET_CHATS', payload: chats })
+        setIsLoading(false)
+        console.log('Group snapshot listener run.')
+      })
+      return () => {
+        unsub()
+      }
     }
-
-    if (currentUser.uid) {
-      getChatsOnUserChange(currentUser.uid)
-    }
+    fetchGroupsByUser(currentUser.uid)
   }, [currentUser.uid])
 
   return (

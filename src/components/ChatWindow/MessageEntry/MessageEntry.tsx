@@ -1,15 +1,15 @@
 import React from 'react'
 import { useUserContext } from '../../../context/auth'
-import { Chat, Message } from '../../../types'
+import { Message, UserInfo } from '../../../types'
 import Avatar from '../../Avatar/Avatar'
 import './MessageEntry.css'
 
 interface MessageEntryProps {
-  chat: Chat
+  chatUser: UserInfo
   message: Message
 }
 
-const MessageEntry = ({ chat, message }: MessageEntryProps) => {
+const MessageEntry = ({ chatUser, message }: MessageEntryProps) => {
   const [currentUser] = useUserContext()
   return (
     <div
@@ -23,7 +23,7 @@ const MessageEntry = ({ chat, message }: MessageEntryProps) => {
         imagePath={
           currentUser.uid === message.senderId
             ? currentUser.photoURL!
-            : chat.chatImageURL
+            : chatUser.photoURL
         }
       />
       <div className="message-text-container">
