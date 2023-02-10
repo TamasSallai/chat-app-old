@@ -1,0 +1,29 @@
+.messages-section {
+  height: calc(100% - 10rem);
+  margin-top: auto;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1rem;
+}
+
+.messages-container {
+  min-height: 100%;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+.messages-container::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background: #c9c9c9;
+  border-radius: 25px;
+}

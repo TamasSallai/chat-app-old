@@ -1,0 +1,17 @@
+.chat-window-header {
+  height: 4rem;
+  padding-inline: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: none;
+  border-bottom: 1px solid #c9c9c9;
+}
+
+.chat-window-header > h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

@@ -1,0 +1,20 @@
+.message-input-container {
+  height: 6rem;
+  margin-inline: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-input {
+  display: block;
+  margin: auto 0;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  border: 1px solid #c9c9c9;
+  border-radius: 10px;
+}
+
+.message-input:focus {
+  border: 1px solid #c9c9c9;
+  outline: 1px solid #333;
+}

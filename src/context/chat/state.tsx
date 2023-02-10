@@ -38,25 +38,19 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    console.log('Subscribe to group snapshot listener.')
-    const fetchGroupsByUser = (uid: string) => {
-      const q = query(
-        collection(db, 'chats'),
-        where(`members.${uid}`, '!=', null)
+    const q = query(
+      collection(db, 'chats'),
+      where(`members.${currentUser.uid}`, '!=', null)
+    )
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      const chats = querySnapshot.docs.map(
+        (chatSnap) => chatSnap.data() as ChatDocument
       )
-      const unsub = onSnapshot(q, (querySnapshot) => {
-        const chats = querySnapshot.docs.map(
-          (chatSnap) => chatSnap.data() as ChatDocument
-        )
-        dispatch({ type: 'GET_CHATS', payload: chats })
-        setIsLoading(false)
-        console.log('Group snapshot listener run.')
-      })
-      return () => {
-        unsub()
-      }
-    }
-    fetchGroupsByUser(currentUser.uid)
+      dispatch({ type: 'GET_CHATS', payload: chats })
+      setIsLoading(false)
+    })
+
+    return () => unsub()
   }, [currentUser.uid])
 
   return (

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { useUserContext } from '../../../context/auth'
 import { ChatDocument, Message } from '../../../types'
 import Avatar from '../../Avatar/Avatar'
@@ -33,7 +33,6 @@ const ChatEntry = ({ isExpanded, chatDocument }: ChatEntryProps) => {
   }
 
   useEffect(() => {
-    console.log(lastMessage)
     if (lastMessage) {
       if (lastMessage.createdAt) calculateLastMessageTime(lastMessage)
       const interval = setInterval(
@@ -45,7 +44,7 @@ const ChatEntry = ({ isExpanded, chatDocument }: ChatEntryProps) => {
   }, [lastMessage])
 
   return (
-    <Link className="chat-entry" to={id}>
+    <NavLink className="chat-entry" to={id}>
       <Avatar imagePath={chatUserMemo!.photoURL} />
       {isExpanded && (
         <div className="chat-entry-expanded">
@@ -62,7 +61,7 @@ const ChatEntry = ({ isExpanded, chatDocument }: ChatEntryProps) => {
           )}
         </div>
       )}
-    </Link>
+    </NavLink>
   )
 }
 

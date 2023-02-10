@@ -10,16 +10,15 @@ import {
   arrayUnion,
   collection,
   doc,
-  getDoc,
   getDocs,
   getFirestore,
   limit,
-  onSnapshot,
   orderBy,
   query,
   runTransaction,
   serverTimestamp,
   setDoc,
+  startAfter,
   where,
   writeBatch,
 } from 'firebase/firestore'
@@ -152,24 +151,6 @@ export const fetchChatsByUserId = async (uid: string) => {
   return groups
 }
 
-export const fetchMessagesByChatId = async (
-  chatId: string,
-  queryLimit: number
-) => {
-  const q = query(
-    collection(doc(db, 'chats', chatId), 'messages'),
-    limit(queryLimit),
-    orderBy('createdAt')
-  )
-  const unsub = onSnapshot(q, (querySnapshot) => {
-    querySnapshot.docs.map(
-      (messageSnap) => messageSnap.data() as MessageDocument
-    )
-  })
-
-  return () => unsub()
-}
-
 export const createMessage = async (
   chatId: string,
   currentUserId: string,
@@ -190,6 +171,39 @@ export const createMessage = async (
     lastMessage: message,
   })
   await batch.commit()
+}
 
-  return (await getDoc(messageRef)).data() as MessageDocument
+export const fetchMessagesByChatId = async (
+  chatId: string,
+  queryLimit: number
+) => {
+  const q = query(
+    collection(doc(db, 'chats', chatId), 'messages'),
+    orderBy('createdAt', 'desc'),
+    limit(queryLimit)
+  )
+  const querySnapshot = await getDocs(q)
+  const messages = querySnapshot.docs.map(
+    (messageSnap) => messageSnap.data() as MessageDocument
+  )
+  return messages
+}
+
+export const fetchOlderMessagesByChatId = async (
+  chatId: string,
+  queryLimit: number,
+  lastMessage: MessageDocument
+) => {
+  const q = query(
+    collection(doc(db, 'chats', chatId), 'messages'),
+    orderBy('createdAt', 'desc'),
+    limit(queryLimit),
+    startAfter(lastMessage)
+  )
+
+  const querySnapshot = await getDocs(q)
+  const messages = querySnapshot.docs.map(
+    (messageSnap) => messageSnap.data() as MessageDocument
+  )
+  return messages
 }
