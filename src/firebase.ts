@@ -175,31 +175,25 @@ export const createMessage = async (
 
 export const fetchMessagesByChatId = async (
   chatId: string,
-  queryLimit: number
-) => {
-  const q = query(
-    collection(doc(db, 'chats', chatId), 'messages'),
-    orderBy('createdAt', 'desc'),
-    limit(queryLimit)
-  )
-  const querySnapshot = await getDocs(q)
-  const messages = querySnapshot.docs.map(
-    (messageSnap) => messageSnap.data() as MessageDocument
-  )
-  return messages
-}
-
-export const fetchOlderMessagesByChatId = async (
-  chatId: string,
   queryLimit: number,
-  lastMessage: MessageDocument
+  lastMessage: MessageDocument | null = null
 ) => {
-  const q = query(
-    collection(doc(db, 'chats', chatId), 'messages'),
-    orderBy('createdAt', 'desc'),
-    limit(queryLimit),
-    startAfter(lastMessage)
-  )
+  let q = null
+
+  if (lastMessage) {
+    q = query(
+      collection(doc(db, 'chats', chatId), 'messages'),
+      orderBy('createdAt', 'desc'),
+      limit(queryLimit),
+      startAfter(lastMessage.createdAt)
+    )
+  } else {
+    q = query(
+      collection(doc(db, 'chats', chatId), 'messages'),
+      orderBy('createdAt', 'desc'),
+      limit(queryLimit)
+    )
+  }
 
   const querySnapshot = await getDocs(q)
   const messages = querySnapshot.docs.map(

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useUserContext } from '../../context/auth'
 import { ChatDocument, MessageDocument } from '../../types'
 import { createMessage, fetchMessagesByChatId } from '../../firebase'
@@ -15,6 +15,19 @@ const ChatWindow = ({ chat }: ChatWindowProps) => {
   const [messages, setMessages] = useState<MessageDocument[]>([])
   const [currentUser] = useUserContext()
 
+  const handleMessageFetch = useCallback(
+    async (lastMessage: MessageDocument) => {
+      console.log('fetch run')
+      const fetchedMessages = await fetchMessagesByChatId(
+        chat.id,
+        15,
+        lastMessage
+      )
+      setMessages((messages) => [...messages, ...fetchedMessages])
+    },
+    [chat.id]
+  )
+
   useEffect(() => {
     fetchMessagesByChatId(chat.id, 15).then((fetchedMessages) =>
       setMessages(fetchedMessages)
@@ -28,7 +41,11 @@ const ChatWindow = ({ chat }: ChatWindowProps) => {
   return (
     <div className="chat-window">
       <ChatWindowHeader />
-      <MessagesSection chat={chat} messages={messages} />
+      <MessagesSection
+        chat={chat}
+        messages={messages}
+        onClick={() => handleMessageFetch(messages[messages.length - 1])}
+      />
       <MessageInput sendMessage={sendMessage} />
     </div>
   )

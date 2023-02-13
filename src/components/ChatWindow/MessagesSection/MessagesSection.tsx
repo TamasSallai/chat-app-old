@@ -9,9 +9,10 @@ import './MessagesSection.css'
 interface MessagesSectionProps {
   chat: ChatDocument
   messages: MessageDocument[]
+  onClick: () => void
 }
 
-const MessagesSection = ({ chat, messages }: MessagesSectionProps) => {
+const MessagesSection = ({ chat, messages, onClick }: MessagesSectionProps) => {
   return (
     <div className="messages-section">
       <div className="messages-container">
@@ -21,6 +22,7 @@ const MessagesSection = ({ chat, messages }: MessagesSectionProps) => {
             message={convertMessageType(message, chat)}
           />
         ))}
+        <button onClick={onClick}>fetch older messages</button>
       </div>
     </div>
   )
