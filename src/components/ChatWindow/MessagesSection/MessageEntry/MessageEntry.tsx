@@ -16,13 +16,13 @@ const MessageEntry = ({ message }: MessageEntryProps) => {
     <div
       style={{ display: isLoading ? 'none' : 'flex' }}
       className={
-        currentUser.uid === message?.sender?.id
+        currentUser.uid === message.sender?.id
           ? 'message-entry owner'
           : 'message-entry'
       }
     >
       <Avatar
-        imagePath={message.sender.photoURL}
+        imagePath={message.sender?.photoURL}
         onLoad={() => setIsLoading(false)}
       />
       <div className="message-text-container">
