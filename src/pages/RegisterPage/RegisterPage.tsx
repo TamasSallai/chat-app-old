@@ -23,6 +23,17 @@ const RegisterPage = () => {
     }
   }
 
+  const handleFileChange = (file: File) => {
+    const fileSizeInKb = file.size / 1024
+    if (fileSizeInKb <= 500) {
+      setFile(file)
+    } else {
+      setError(
+        'The uploaded file is too big. The maximum size of the image is 500Kb.'
+      )
+    }
+  }
+
   return (
     <div className="register-page">
       {error && <div>{error}</div>}
@@ -56,7 +67,7 @@ const RegisterPage = () => {
           <input
             type="file"
             required
-            onChange={(e) => setFile(e.currentTarget.files![0])}
+            onChange={(e) => handleFileChange(e.currentTarget.files![0])}
           />
         </div>
         <button type="submit">Login</button>

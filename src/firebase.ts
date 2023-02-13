@@ -56,7 +56,8 @@ export const registerUser = async (
   const user = userCreds.user
 
   const profilePictureRef = ref(storage, email)
-  await uploadBytes(profilePictureRef, profilePicture)
+  const metadata = { cacheControl: 'public, max-age=43200' }
+  await uploadBytes(profilePictureRef, profilePicture, metadata)
   const downloadProfilePictureURL = await getDownloadURL(profilePictureRef)
 
   await setDoc(doc(db, 'users', user.uid), {
