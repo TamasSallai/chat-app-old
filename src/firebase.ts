@@ -200,5 +200,6 @@ export const fetchMessagesByChatId = async (
   const messages = querySnapshot.docs.map(
     (messageSnap) => messageSnap.data() as MessageDocument
   )
+  messages.shift()
   return messages
 }

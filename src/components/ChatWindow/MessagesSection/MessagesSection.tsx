@@ -9,10 +9,16 @@ import './MessagesSection.css'
 interface MessagesSectionProps {
   chat: ChatDocument
   messages: MessageDocument[]
-  onClick: () => void
+  isEndOfMessages: boolean
+  handleMessageFetch: () => Promise<void>
 }
 
-const MessagesSection = ({ chat, messages, onClick }: MessagesSectionProps) => {
+const MessagesSection = ({
+  chat,
+  messages,
+  isEndOfMessages,
+  handleMessageFetch,
+}: MessagesSectionProps) => {
   return (
     <div className="messages-section">
       <div className="messages-container">
@@ -22,7 +28,11 @@ const MessagesSection = ({ chat, messages, onClick }: MessagesSectionProps) => {
             message={convertMessageType(message, chat)}
           />
         ))}
-        <button onClick={onClick}>fetch older messages</button>
+        {isEndOfMessages ? (
+          <div>No more messages</div>
+        ) : (
+          <button onClick={handleMessageFetch}>fetch older messages</button>
+        )}
       </div>
     </div>
   )
