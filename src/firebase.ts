@@ -10,14 +10,15 @@ import {
   arrayUnion,
   collection,
   doc,
-  getDoc,
   getDocs,
   getFirestore,
   limit,
   orderBy,
   query,
+  runTransaction,
   serverTimestamp,
   setDoc,
+  startAfter,
   where,
   writeBatch,
 } from 'firebase/firestore'
@@ -55,7 +56,8 @@ export const registerUser = async (
   const user = userCreds.user
 
   const profilePictureRef = ref(storage, email)
-  await uploadBytes(profilePictureRef, profilePicture)
+  const metadata = { cacheControl: 'public, max-age=43200' }
+  await uploadBytes(profilePictureRef, profilePicture, metadata)
   const downloadProfilePictureURL = await getDownloadURL(profilePictureRef)
 
   await setDoc(doc(db, 'users', user.uid), {
@@ -75,7 +77,10 @@ export const registerUser = async (
   return user
 }
 
-export const getUsers = async (currentUserId: string, username: string) => {
+export const fetchUsersByUsername = async (
+  currentUserId: string,
+  username: string
+) => {
   const q = query(collection(db, 'users'), where('username', '==', username))
 
   try {
@@ -102,18 +107,18 @@ export const createChat = async (
   batch.set(chatRef, {
     id: chatId,
     createdAt: serverTimestamp(),
-    participants: [
-      {
+    members: {
+      [currentUser.uid]: {
         id: currentUser.uid,
         username: currentUser.displayName,
         photoURL: currentUser.photoURL,
       },
-      {
+      [searchedUser.id]: {
         id: searchedUser.id,
         username: searchedUser.username,
         photoURL: searchedUser.photoURL,
       },
-    ],
+    },
   })
 
   batch.update(doc(db, 'users', currentUser.uid), {
@@ -127,30 +132,24 @@ export const createChat = async (
   await batch.commit()
 }
 
-export const getAllChats = async (userId: string) => {
-  const userSnap = await getDoc(doc(db, 'users', userId))
-  const userDoc = userSnap.data() as UserDocument
+export const fetchChatsByUserId = async (uid: string) => {
+  const userRef = doc(db, 'users', uid)
 
-  const chatRefs = userDoc.chatRefs
-  const chatSnaps = await Promise.all(
-    chatRefs.map((chatRef) => getDoc(chatRef))
-  )
-  const chatDocs = chatSnaps
-    .map((chatSnap) => chatSnap.data())
-    .filter((chatDoc) => chatDoc !== undefined) as ChatDocument[]
+  const groups = await runTransaction(db, async (transaction) => {
+    const userSnap = await transaction.get(userRef)
+    const userDoc = userSnap.data() as UserDocument
+    const chatRefs = userDoc.chatRefs
 
-  return chatDocs
-}
+    const chatSnaps = await Promise.all(
+      chatRefs.map((chatRef) => transaction.get(chatRef))
+    )
 
-export const getMessages = async (chatId: string, queryLimit: number) => {
-  const messagesRef = collection(doc(db, 'chats', chatId), 'messages')
-  const q = query(messagesRef, limit(queryLimit), orderBy('createdAt'))
-  const querySnapshot = await getDocs(q)
-  const messageDocs = querySnapshot.docs.map(
-    (docSnap) => docSnap.data() as MessageDocument
-  )
+    return chatSnaps
+      .filter((chatSnap) => chatSnap.exists())
+      .map((chatSnap) => chatSnap.data() as ChatDocument)
+  })
 
-  return messageDocs
+  return groups
 }
 
 export const createMessage = async (
@@ -160,19 +159,47 @@ export const createMessage = async (
 ) => {
   const messageId = uuid()
   const message = {
-    mid: messageId,
+    id: messageId,
     senderId: currentUserId,
     content: content,
     createdAt: serverTimestamp(),
   }
+  const messageRef = doc(db, 'chats', chatId, 'messages', messageId)
 
   const batch = writeBatch(db)
-
-  batch.set(doc(db, 'chats', chatId, 'messages', messageId), message)
-
+  batch.set(messageRef, message)
   batch.update(doc(db, 'chats', chatId), {
     lastMessage: message,
   })
-
   await batch.commit()
+}
+
+export const fetchMessagesByChatId = async (
+  chatId: string,
+  queryLimit: number,
+  lastMessage: MessageDocument | null = null
+) => {
+  let q = null
+
+  if (lastMessage) {
+    q = query(
+      collection(doc(db, 'chats', chatId), 'messages'),
+      orderBy('createdAt', 'desc'),
+      limit(queryLimit),
+      startAfter(lastMessage.createdAt)
+    )
+  } else {
+    q = query(
+      collection(doc(db, 'chats', chatId), 'messages'),
+      orderBy('createdAt', 'desc'),
+      limit(queryLimit)
+    )
+  }
+
+  const querySnapshot = await getDocs(q)
+  const messages = querySnapshot.docs.map(
+    (messageSnap) => messageSnap.data() as MessageDocument
+  )
+  messages.shift()
+  return messages
 }

@@ -1,9 +1,9 @@
-import { Chat } from '../../types'
+import { ChatDocument } from '../../types'
 import { ChatContextType } from './state'
 
 export type Action =
-  | { type: 'GET_CHATS'; payload: Chat[] }
-  | { type: 'ADD_CHAT'; payload: Chat }
+  | { type: 'GET_CHATS'; payload: ChatDocument[] }
+  | { type: 'ADD_CHAT'; payload: ChatDocument }
   | { type: 'SELECT_CHAT'; payload: string }
 
 export const reducer = (state: ChatContextType, action: Action) => {

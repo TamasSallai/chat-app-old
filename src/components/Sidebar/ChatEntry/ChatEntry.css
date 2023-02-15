@@ -12,6 +12,10 @@
   background-color: #e9ecf5;
 }
 
+.chat-entry.active {
+  background-color: #e9ecf5;
+}
+
 .chat-entry[data-expanded='false'] {
   width: fit-content;
 }

@@ -1,19 +1,25 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { NavLink } from 'react-router-dom'
 import { useUserContext } from '../../../context/auth'
-import { Chat, Message } from '../../../types'
+import { ChatDocument, Message } from '../../../types'
 import Avatar from '../../Avatar/Avatar'
 import './ChatEntry.css'
 
 interface ChatEntryProps {
   isExpanded: boolean
-  chat: Chat
+  chatDocument: ChatDocument
 }
 
-const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
-  const { chatName, chatImageURL, lastMessage } = chat
-  const [currentUser] = useUserContext()
+const ChatEntry = ({ isExpanded, chatDocument }: ChatEntryProps) => {
   const [lastMessageTime, setLastMessageTime] = useState('')
+  const [currentUser] = useUserContext()
+  const { id, members, lastMessage } = chatDocument
+
+  const chatUserMemo = useMemo(() => {
+    return Object.values(members).find((member) => {
+      return member.id !== currentUser.uid && member
+    })
+  }, [currentUser.uid, members])
 
   const calculateLastMessageTime = ({ createdAt }: Message) => {
     const lastMessageMillis = createdAt.toMillis()
@@ -28,7 +34,7 @@ const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
 
   useEffect(() => {
     if (lastMessage) {
-      calculateLastMessageTime(lastMessage)
+      if (lastMessage.createdAt) calculateLastMessageTime(lastMessage)
       const interval = setInterval(
         () => calculateLastMessageTime(lastMessage),
         3600000
@@ -38,11 +44,11 @@ const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
   }, [lastMessage])
 
   return (
-    <Link className="chat-entry" to={chat.id}>
-      <Avatar imagePath={chatImageURL} />
+    <NavLink className="chat-entry" to={id}>
+      <Avatar imagePath={chatUserMemo!.photoURL} />
       {isExpanded && (
         <div className="chat-entry-expanded">
-          <div className="chat-name">{chatName}</div>
+          <div className="chat-name">{chatUserMemo!.username}</div>
           {lastMessage && (
             <div className="last-message-container">
               <div className="last-message">
@@ -55,7 +61,7 @@ const ChatEntry = ({ isExpanded, chat }: ChatEntryProps) => {
           )}
         </div>
       )}
-    </Link>
+    </NavLink>
   )
 }
 

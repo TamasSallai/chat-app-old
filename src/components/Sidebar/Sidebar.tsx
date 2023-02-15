@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useUserContext } from '../../context/auth'
 import { useChatContext } from '../../context/chat'
 import { UserDocument } from '../../types'
-import { createChat, getUsers } from '../../firebase'
+import { createChat, fetchUsersByUsername } from '../../firebase'
 import UserEntry from './UserEntry/UserEntry'
 import ChatEntry from './ChatEntry/ChatEntry'
 import './Sidebar.css'
@@ -15,20 +15,17 @@ const Sidebar = () => {
   const [data] = useChatContext()
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    try {
-      if (e.code === 'Enter') {
-        const firebaseUsers = await getUsers(currentUser.uid, searchInput)
-        setUsers(firebaseUsers)
-      }
-    } catch (e) {
-      if (e instanceof Error) {
-        console.log(e.message)
-      }
+    if (e.code === 'Enter') {
+      const firebaseUsers = await fetchUsersByUsername(
+        currentUser.uid,
+        searchInput
+      )
+      setUsers(firebaseUsers)
     }
   }
 
-  const handleCreateChat = async (userDoc: UserDocument) => {
-    await createChat(currentUser, userDoc)
+  const handleCreateChat = async (searchedUserDoc: UserDocument) => {
+    await createChat(currentUser, searchedUserDoc)
     setSearchInput('')
     setUsers([])
   }
@@ -95,8 +92,12 @@ const Sidebar = () => {
         <div className="chats-section">
           <h3 className="sidebar-header">Chats</h3>
           <div>
-            {Object.values(data.chatList).map((chat) => (
-              <ChatEntry key={chat.id} chat={chat} isExpanded={isExpanded} />
+            {Object.values(data.chatList).map((chatDocument) => (
+              <ChatEntry
+                key={chatDocument.id}
+                chatDocument={chatDocument}
+                isExpanded={isExpanded}
+              />
             ))}
           </div>
         </div>

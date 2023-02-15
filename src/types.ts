@@ -27,36 +27,25 @@ export type MessageDocument = Message & DocumentData
 export interface ChatDocument extends DocumentData {
   id: string
   createdAt: Timestamp
-  participants: UserInfo[]
+  members: Record<string, UserInfo>
   lastMessage?: Message
 }
 
-export interface ChatDocumentWithMessages extends ChatDocument {
-  messages: Message[]
-}
-
-export interface Chat {
+export interface MessageInfo {
   id: string
-  chatName: string
-  chatImageURL: string
-  participants: UserInfo[]
-  lastMessage?: Message
-  messages: Message[]
+  sender: UserInfo
+  content: string
+  createdAt: Timestamp
 }
 
-export const convertChat = (
-  currentUserId: string,
+export const convertMessageType = (
+  messageDoc: MessageDocument,
   chatDoc: ChatDocument
-): Chat => {
-  const { id, participants, lastMessage } = chatDoc
-  const userInfo = participants.find((user) => user.id !== currentUserId)
-
+): MessageInfo => {
   return {
-    id: id,
-    chatName: userInfo!.username,
-    chatImageURL: userInfo!.photoURL,
-    participants: participants,
-    lastMessage: lastMessage,
-    messages: [],
+    id: messageDoc.id,
+    content: messageDoc.content,
+    createdAt: messageDoc.createdAt,
+    sender: chatDoc.members[messageDoc.senderId],
   }
 }

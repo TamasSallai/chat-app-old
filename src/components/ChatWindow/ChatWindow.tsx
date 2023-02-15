@@ -1,71 +1,88 @@
-import { useEffect, useRef, useState } from 'react'
-import { Chat, MessageDocument } from '../../types'
-import { doc, onSnapshot } from 'firebase/firestore'
-import { createMessage, db, getMessages } from '../../firebase'
-import MessageEntry from './MessageEntry/MessageEntry'
-import Avatar from '../Avatar/Avatar'
-import './ChatWindow.css'
+import { useCallback, useEffect, useState } from 'react'
 import { useUserContext } from '../../context/auth'
+import { ChatDocument, MessageDocument } from '../../types'
+import { db, createMessage, fetchMessagesByChatId } from '../../firebase'
+import MessagesSection from './MessagesSection/MessagesSection'
+import MessageInput from './MessageInput/MessageInput'
+import ChatWindowHeader from './ChatWindowHeader/ChatWindowHeader'
+import './ChatWindow.css'
+import {
+  collection,
+  doc,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+} from 'firebase/firestore'
 
 interface ChatWindowProps {
-  chat: Chat
+  chat: ChatDocument
 }
 
 const ChatWindow = ({ chat }: ChatWindowProps) => {
-  const [currentUser] = useUserContext()
+  const [isEndOfMessages, setIsEndOfMessages] = useState(false)
   const [messages, setMessages] = useState<MessageDocument[]>([])
-  const [input, setInput] = useState('')
-  const messagesBottom = useRef<HTMLDivElement>(null)
+  const [currentUser] = useUserContext()
+
+  const handleMessageFetch = useCallback(
+    async (lastMessage: MessageDocument) => {
+      const fetchedMessages = await fetchMessagesByChatId(
+        chat.id,
+        15,
+        lastMessage
+      )
+      if (fetchedMessages.length > 0) {
+        setMessages((messages) => [...messages, ...fetchedMessages])
+      } else {
+        setIsEndOfMessages(true)
+      }
+    },
+    [chat.id]
+  )
+
+  const sendMessage = async (messageInput: string) => {
+    await createMessage(chat.id, currentUser.uid, messageInput)
+  }
 
   useEffect(() => {
-    console.log('subscribing to new snapshot listener')
-    const unsub = onSnapshot(doc(db, 'chats', chat.id), async () => {
-      setMessages(await getMessages(chat.id, 25))
-      console.log('onSnapshot run')
+    setIsEndOfMessages(false)
+
+    fetchMessagesByChatId(chat.id, 15).then((fetchedMessages) => {
+      setMessages(fetchedMessages)
+    })
+
+    const q = query(
+      collection(doc(db, 'chats', chat.id), 'messages'),
+      orderBy('createdAt', 'desc'),
+      limit(1)
+    )
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      querySnapshot.docChanges().forEach((change) => {
+        if (change.type === 'added') {
+          const newMessage = change.doc.data() as MessageDocument
+          setMessages((messages) => [newMessage, ...messages])
+        }
+      })
     })
 
     return () => {
-      console.log('unsubscribe from snapshot listener')
-      unsub()
+      setMessages([])
+      return unsub()
     }
   }, [chat.id])
 
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === 'Enter') {
-      await createMessage(chat.id, currentUser.uid, input)
-      setInput('')
-
-      messagesBottom.current?.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
   return (
     <div className="chat-window">
-      {/* Chat header */}
-      <div className="chat-window-header">
-        <Avatar imagePath={chat.chatImageURL} />
-        <h3>{chat.chatName}</h3>
-      </div>
-
-      {/* Messages */}
-      <div className="message-entries">
-        {messages.map((message) => (
-          <MessageEntry key={message.id} message={message} chat={chat} />
-        ))}
-        <div ref={messagesBottom}></div>
-      </div>
-
-      {/* Message input */}
-      <div className="message-input-container">
-        <input
-          className="message-input"
-          type="text"
-          placeholder="Write a message"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => handleKeyDown(e)}
-        />
-      </div>
+      <ChatWindowHeader />
+      <MessagesSection
+        chat={chat}
+        messages={messages}
+        isEndOfMessages={isEndOfMessages}
+        handleMessageFetch={() =>
+          handleMessageFetch(messages[messages.length - 1])
+        }
+      />
+      <MessageInput sendMessage={sendMessage} />
     </div>
   )
 }
