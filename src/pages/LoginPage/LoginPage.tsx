@@ -1,45 +1,62 @@
 import { useState } from 'react'
+import { TextInput, TextInputProps } from '../../components/TextInput/TextInput'
 import { useAuthContext } from '../../context/auth'
 import { loginUser } from '../../firebase'
+import './LoginPage.css'
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-
   const [, dispatch] = useAuthContext()
+  const [formValues, setFormValues] = useState({
+    email: '',
+    password: '',
+  })
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormValues({ ...formValues, [e.target.name]: e.target.value })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const user = await loginUser(email, password)
+      const user = await loginUser(formValues.email, formValues.password)
       dispatch({ type: 'LOGIN', payload: user })
     } catch (e) {
-      if (e instanceof Error) setError(e.message)
+      console.log(e)
     }
   }
 
+  const textInputProps: TextInputProps[] = [
+    {
+      id: 'email',
+      name: 'email',
+      label: 'E-mail',
+      required: true,
+      pattern:
+        '^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$',
+      errorMessage: 'Please give a valid e-mail.',
+      onChange: onChange,
+    },
+    {
+      id: 'password',
+      name: 'password',
+      label: 'Password',
+      required: true,
+      pattern: '(?=^.{8,}$)(?=.*[a-zA-Z])(?=.*[\\W_])(?=^.*[^\\s].*$).*$',
+      errorMessage:
+        'Minimum eight characters, at least one letter, one number and one special character:',
+      onChange: onChange,
+    },
+  ]
+
   return (
     <div className="login-page">
-      {error && <div>{error}</div>}
-      <form onSubmit={(e) => handleSubmit(e)}>
-        <div>
-          <label>E-mail</label>
-          <input
-            type="email"
-            required
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Password</label>
-          <input
-            type="password"
-            required
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit">Login</button>
+      <form className="login-form" onSubmit={handleSubmit}>
+        {textInputProps.map((props) => (
+          <TextInput key={props.id} {...props} />
+        ))}
+        <button className="btn-primary" type="submit">
+          Login
+        </button>
       </form>
     </div>
   )

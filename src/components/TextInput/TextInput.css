@@ -1,0 +1,90 @@
+.text-input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.text-input-group > *:not(:first-child) {
+  margin-top: 5px;
+}
+
+.text-input-group > label {
+  padding-left: 0.2rem;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.input-container {
+  position: relative;
+}
+
+.text-input {
+  width: 100%;
+  height: 2.2rem;
+  padding-left: 1rem;
+  padding-right: 2rem;
+  font-size: 0.9rem;
+  color: var(--text-clr);
+  border: 1px solid rgb(136, 147, 151);
+  border-radius: 6px;
+  outline: none;
+  transition: all 200ms;
+}
+
+.text-input:hover {
+  box-shadow: rgb(232 237 235) 0px 0px 0px 3px;
+}
+
+.text-input[data-blurred='true']:focus,
+.text-input[data-blurred='true']:valid:focus,
+.text-input[data-blurred='true']:invalid:focus {
+  box-shadow: rgb(4 152 236) 0px 0px 0px 3px;
+  border: 1px solid rgb(4 152 236);
+}
+
+.text-input[data-blurred='true']:invalid {
+  border: 1px solid rgb(219, 48, 48);
+}
+
+.text-input[data-blurred='true']:invalid:hover:not(:focus) {
+  box-shadow: rgb(255 205 199) 0px 0px 0px 3px;
+}
+
+.text-input:valid {
+  border: 1px solid rgb(0, 163, 92);
+}
+
+.text-input:valid:hover:not(:focus) {
+  box-shadow: rgb(192 250 230) 0px 0px 0px 3px;
+}
+
+.input-icon {
+  display: none;
+  position: absolute;
+  right: 7px;
+  top: calc(50% - 10px);
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.input-icon-checkmark {
+  fill: rgb(0, 163, 92);
+}
+
+.text-input:valid ~ .input-icon-checkmark {
+  display: block;
+}
+
+.input-icon-cross {
+  fill: rgb(219, 48, 48);
+}
+
+.text-input[data-blurred='true']:invalid ~ .input-icon-cross {
+  display: block;
+}
+
+.input-error-message {
+  display: block;
+  font-size: 0.8rem;
+  padding-left: 0.2rem;
+}
