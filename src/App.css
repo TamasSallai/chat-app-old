@@ -1,3 +1,22 @@
 main {
   height: calc(100vh - 75px);
 }
+
+.auth-redirect {
+  align-self: center;
+  font-size: 0.9rem;
+}
+
+.auth-redirect > a {
+  color: rgb(4 152 236);
+}
+
+.error-message {
+  padding: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: rgb(206, 10, 10);
+  background-color: rgb(255, 234, 229);
+  border: 1px solid rgb(255, 205, 199);
+  border-radius: 6px;
+}

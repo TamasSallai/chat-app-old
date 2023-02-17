@@ -1,0 +1,21 @@
+.btn-primary {
+  height: 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  background-color: rgb(4 152 236);
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms;
+}
+
+.btn-primary:hover {
+  box-shadow: rgba(4, 151, 236, 0.233) 0px 0px 0px 3px;
+}
+
+.btn-primary:disabled {
+  background-color: rgba(4, 151, 236, 0.521);
+  box-shadow: none;
+  cursor: wait;
+}

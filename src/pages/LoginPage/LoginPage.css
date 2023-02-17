@@ -1,0 +1,28 @@
+.login-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: column;
+}
+
+.login-form-container {
+  width: 25rem;
+  margin-top: 1rem;
+  padding: 1.2rem;
+  color: #333;
+}
+
+.login-form-container > *:not(:first-child) {
+  margin-top: 1.2rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form > *:not(:first-child) {
+  margin-top: 1.2rem;
+}

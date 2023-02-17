@@ -1,12 +1,12 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Navigation from './components/Navigation/Navigation'
 import LoginPage from './pages/LoginPage/LoginPage'
-import RegisterPage from './pages/RegisterPage/RegisterPage'
+import SignupPage from './pages/SignupPage/SignupPage'
 import ChatPage from './pages/ChatPage/ChatPage'
 import ProtectedRoute from './ProtectRoute'
 import { useAuthContext } from './context/auth'
-import './App.css'
 import { ChatProvider } from './context/chat'
+import './App.css'
 
 function App() {
   const [currentUser] = useAuthContext()
@@ -19,7 +19,11 @@ function App() {
           <Route
             path="/"
             element={
-              currentUser ? <Navigate to="/chat" replace /> : <LoginPage />
+              currentUser ? (
+                <Navigate to="/chat" replace />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
           <Route
@@ -29,9 +33,9 @@ function App() {
             }
           />
           <Route
-            path="/register"
+            path="/signup"
             element={
-              currentUser ? <Navigate to="/chat" replace /> : <RegisterPage />
+              currentUser ? <Navigate to="/chat" replace /> : <SignupPage />
             }
           />
           <Route
