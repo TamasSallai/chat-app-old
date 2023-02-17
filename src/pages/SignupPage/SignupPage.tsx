@@ -52,6 +52,9 @@ const SignupPage = () => {
         )
         dispatch({ type: 'LOGIN', payload: user })
         setIsLoading(false)
+      } else {
+        setError('Profile picture required.')
+        setIsLoading(false)
       }
     } catch (e) {
       if (e instanceof FirebaseError) {
