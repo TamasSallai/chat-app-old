@@ -3,12 +3,23 @@ import './ButtonPrimary.css'
 interface ButtonPrimaryProps {
   text: string
   type: 'button' | 'submit'
-  isLoading: boolean
+  isLoading?: boolean
+  onClick?: () => void
 }
 
-const ButtonPrimary = ({ text, type, isLoading }: ButtonPrimaryProps) => {
+const ButtonPrimary = ({
+  text,
+  type,
+  isLoading,
+  onClick,
+}: ButtonPrimaryProps) => {
   return (
-    <button className="btn-primary" type={type} disabled={isLoading}>
+    <button
+      className="btn-primary"
+      type={type}
+      disabled={isLoading}
+      onClick={onClick}
+    >
       {text}
     </button>
   )
