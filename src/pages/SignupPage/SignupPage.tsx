@@ -69,7 +69,7 @@ const SignupPage = () => {
       label: 'Username',
       placeholder: 'Enter your username',
       required: true,
-      pattern: '^[a-zA-Z0-9]{3,10}$',
+      pattern: '^[a-zA-Z0-9]{3,30}$',
       autoComplete: 'username',
       onChange: onChange,
     },
