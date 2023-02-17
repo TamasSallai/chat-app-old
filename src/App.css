@@ -2,13 +2,21 @@ main {
   height: calc(100vh - 75px);
 }
 
-.btn-primary {
-  width: 5rem;
-  height: 2.5rem;
-  font-weight: 700;
-  color: #fff;
-  background-color: rgb(4 152 236);
+.auth-redirect {
+  align-self: center;
+  font-size: 0.9rem;
+}
+
+.auth-redirect > a {
+  color: rgb(4 152 236);
+}
+
+.error-message {
+  padding: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: rgb(206, 10, 10);
+  background-color: rgb(255, 234, 229);
+  border: 1px solid rgb(255, 205, 199);
   border-radius: 6px;
-  border: none;
-  cursor: pointer;
 }

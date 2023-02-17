@@ -31,8 +31,8 @@ const Navigation = () => {
 
           {!currentUser && (
             <li>
-              <NavLink className="nav-link" to="./register">
-                Register
+              <NavLink className="nav-link" to="./signup">
+                Sign up
               </NavLink>
             </li>
           )}
