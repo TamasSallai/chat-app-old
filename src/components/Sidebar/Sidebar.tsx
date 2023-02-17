@@ -12,7 +12,7 @@ const Sidebar = () => {
   const [searchInput, setSearchInput] = useState('')
   const [users, setUsers] = useState<UserDocument[]>([])
   const [currentUser] = useUserContext()
-  const [data] = useChatContext()
+  const [{ chatList }] = useChatContext()
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter') {
@@ -24,8 +24,15 @@ const Sidebar = () => {
     }
   }
 
-  const handleCreateChat = async (searchedUserDoc: UserDocument) => {
-    await createChat(currentUser, searchedUserDoc)
+  const handleCreateChat = async (searchedUser: UserDocument) => {
+    const combinedId =
+      currentUser.uid > searchedUser.id
+        ? currentUser.uid + searchedUser.id
+        : searchedUser.id + currentUser.uid
+
+    if (!chatList[combinedId]) {
+      await createChat(currentUser, searchedUser)
+    }
     setSearchInput('')
     setUsers([])
   }
@@ -92,7 +99,7 @@ const Sidebar = () => {
         <div className="chats-section">
           <h3 className="sidebar-header">Chats</h3>
           <div>
-            {Object.values(data.chatList).map((chatDocument) => (
+            {Object.values(chatList).map((chatDocument) => (
               <ChatEntry
                 key={chatDocument.id}
                 chatDocument={chatDocument}

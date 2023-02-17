@@ -77,17 +77,14 @@ export const registerUser = async (
   return user
 }
 
-export const fetchUsersByUsername = async (
-  currentUserId: string,
-  username: string
-) => {
+export const fetchUsersByUsername = async (uid: string, username: string) => {
   const q = query(collection(db, 'users'), where('username', '==', username))
 
   try {
     const querySnapshot = await getDocs(q)
     const userDocuments = querySnapshot.docs
       .map((docSnap) => docSnap.data() as UserDocument)
-      .filter((data) => data.uid !== currentUserId)
+      .filter((data) => data.uid !== uid)
 
     return userDocuments
   } catch (e) {
@@ -99,43 +96,49 @@ export const createChat = async (
   currentUser: User,
   searchedUser: UserDocument
 ) => {
-  const batch = writeBatch(db)
+  const combinedId =
+    currentUser.uid > searchedUser.id
+      ? currentUser.uid + searchedUser.id
+      : searchedUser.id + currentUser.uid
+  const chatRef = doc(db, 'chats', combinedId)
 
-  const chatId = uuid()
-  const chatRef = doc(db, 'chats', chatId)
+  runTransaction(db, async (transaction) => {
+    const chatDoc = await transaction.get(chatRef)
+    if (chatDoc.exists()) {
+      throw new Error('Document does not exist!')
+    }
 
-  batch.set(chatRef, {
-    id: chatId,
-    createdAt: serverTimestamp(),
-    members: {
-      [currentUser.uid]: {
-        id: currentUser.uid,
-        username: currentUser.displayName,
-        photoURL: currentUser.photoURL,
+    transaction.set(chatRef, {
+      id: combinedId,
+      createdAt: serverTimestamp(),
+      members: {
+        [currentUser.uid]: {
+          id: currentUser.uid,
+          username: currentUser.displayName,
+          photoURL: currentUser.photoURL,
+        },
+        [searchedUser.id]: {
+          id: searchedUser.id,
+          username: searchedUser.username,
+          photoURL: searchedUser.photoURL,
+        },
       },
-      [searchedUser.id]: {
-        id: searchedUser.id,
-        username: searchedUser.username,
-        photoURL: searchedUser.photoURL,
-      },
-    },
-  })
+    })
 
-  batch.update(doc(db, 'users', currentUser.uid), {
-    chatRefs: arrayUnion(chatRef),
-  })
+    transaction.update(doc(db, 'users', currentUser.uid), {
+      chatRefs: arrayUnion(chatRef),
+    })
 
-  batch.update(doc(db, 'users', searchedUser.id), {
-    chatRefs: arrayUnion(chatRef),
+    transaction.update(doc(db, 'users', searchedUser.id), {
+      chatRefs: arrayUnion(chatRef),
+    })
   })
-
-  await batch.commit()
 }
 
 export const fetchChatsByUserId = async (uid: string) => {
   const userRef = doc(db, 'users', uid)
 
-  const groups = await runTransaction(db, async (transaction) => {
+  const chats = await runTransaction(db, async (transaction) => {
     const userSnap = await transaction.get(userRef)
     const userDoc = userSnap.data() as UserDocument
     const chatRefs = userDoc.chatRefs
@@ -149,7 +152,7 @@ export const fetchChatsByUserId = async (uid: string) => {
       .map((chatSnap) => chatSnap.data() as ChatDocument)
   })
 
-  return groups
+  return chats
 }
 
 export const createMessage = async (
