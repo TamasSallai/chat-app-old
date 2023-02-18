@@ -9,7 +9,7 @@ const MessageInput = ({ sendMessage }: MessageInputProps) => {
   const [messageInput, setMessageInput] = useState('')
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === 'Enter') {
+    if (e.code === 'Enter' && messageInput.length > 0) {
       sendMessage(messageInput)
       setMessageInput('')
     }
