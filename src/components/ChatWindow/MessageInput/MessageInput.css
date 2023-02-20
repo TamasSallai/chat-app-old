@@ -1,11 +1,13 @@
-.message-input-container {
+.message-input-form {
   height: 6rem;
   margin-inline: 1rem;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .message-input {
+  width: 100%;
   display: block;
   margin: auto 0;
   padding: 0.7rem 1rem;
