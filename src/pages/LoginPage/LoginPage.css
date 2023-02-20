@@ -8,7 +8,7 @@
 }
 
 .login-form-container {
-  width: 25rem;
+  max-width: 25rem;
   margin-top: 1rem;
   padding: 1.2rem;
   color: #333;

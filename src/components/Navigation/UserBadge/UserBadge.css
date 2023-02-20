@@ -1,0 +1,21 @@
+.user-badge {
+  min-height: 75px;
+  padding-inline: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: none;
+  border-bottom: 1px solid #c9c9c9;
+  background-color: #fff;
+}
+
+.user-badge > span {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+@media (max-width: 340px) {
+  .user-badge > span {
+    display: none;
+  }
+}

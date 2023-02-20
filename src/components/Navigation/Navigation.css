@@ -3,20 +3,25 @@
   width: 100%;
   background-color: #fff;
   border-bottom: 1px solid #c9c9c9;
+  position: relative;
 }
 
 .nav-bar {
   max-width: 1800px;
   height: 100%;
   margin-inline: auto;
-  padding-inline: 2rem;
+  padding-inline: 3rem;
   display: flex;
   align-items: center;
 }
 
+@media (max-width: 700px) {
+  .nav-bar {
+    padding-inline: 1.5rem;
+  }
+}
+
 .logo {
-  display: flex;
-  align-items: center;
   font-size: 1.35rem;
   font-weight: 900;
   letter-spacing: 1.4px;
@@ -25,14 +30,40 @@
 }
 
 .nav-menu {
-  height: 100%;
   width: 100%;
   margin-left: 1rem;
   display: flex;
+  background-color: #fff;
+  border-bottom: 1px solid #c9c9c9;
+  transition: display 200ms;
+}
+
+@media (max-width: 700px) {
+  .nav-menu {
+    z-index: 9999;
+    position: absolute;
+    margin: 0;
+    top: 75px;
+    left: 0px;
+    height: 100vh;
+    display: flex;
+    gap: 0rem;
+    flex-direction: column;
+    transition: transform 500ms, visibility 500ms;
+  }
+
+  .nav-menu[data-visible='false'] {
+    display: none;
+    transform: translateX(100vw);
+  }
+
+  .nav-menu[data-visible='true'] {
+    display: flex;
+  }
 }
 
 .nav-link {
-  height: 100%;
+  height: 75px;
   padding: 0 1.25rem;
   display: flex;
   align-items: center;
@@ -55,18 +86,4 @@
 .push-to-right {
   margin-left: auto;
   margin-right: 0;
-}
-
-.nav-logout {
-  height: 100%;
-  padding: 0 1.25rem;
-  font-size: 1.1rem;
-  border: none;
-  background-color: #fff;
-}
-
-.user-badge {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
