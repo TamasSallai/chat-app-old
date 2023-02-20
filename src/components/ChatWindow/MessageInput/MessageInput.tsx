@@ -8,24 +8,24 @@ interface MessageInputProps {
 const MessageInput = ({ sendMessage }: MessageInputProps) => {
   const [messageInput, setMessageInput] = useState('')
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === 'Enter' && messageInput.length > 0) {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (messageInput.length > 0) {
       sendMessage(messageInput)
       setMessageInput('')
     }
   }
 
   return (
-    <div className="message-input-container">
+    <form className="message-input-form" onSubmit={handleSubmit}>
       <input
         className="message-input"
         type="text"
         placeholder="Write a message"
         value={messageInput}
         onChange={(e) => setMessageInput(e.target.value)}
-        onKeyDown={(e) => handleKeyDown(e)}
       />
-    </div>
+    </form>
   )
 }
 
