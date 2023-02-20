@@ -104,6 +104,6 @@
   .sidebar-outer {
     position: fixed;
     width: 4.5rem;
-    z-index: 9999;
+    z-index: 999;
   }
 }
