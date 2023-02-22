@@ -28,3 +28,5 @@ Step-by-step instructions on how to install and configure the project.
 Once you intalled the project you can run it with `npm start`. You can register, login, search for other registered users and start chatting.
 
 The search is case sensitive. To search a user you should type the exact match of their username and hit enter.
+
+example user: tamassallai
